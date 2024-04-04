@@ -3,13 +3,13 @@ const bodyParser = require("body-parser");
 const connection = require("./config/dbConfig");
 const app = express();
 
-const authRoutes = require("./routes/authRoutes");
+const authEmployeeRoutes = require("./routes/authEmployeeRoutes");
 
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authEmployeeRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
