@@ -1,11 +1,12 @@
 // dbConfig.js
+require("dotenv").config();
 const mysql = require("mysql");
 
 const connection = mysql.createConnection({
-  host: "mahou-db.csu9y7b3a0hk.us-east-1.rds.amazonaws.com",
-  user: "hmoms-app",
-  password: "app-pwd",
-  database: "hmoms",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 //command to connect mysql via ubuntu
 // mysql -u hmoms-app -p -h mahou-db.csu9y7b3a0hk.us-east-1.rds.amazonaws.com -P 3306 hmoms
