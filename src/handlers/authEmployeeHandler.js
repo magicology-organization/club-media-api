@@ -1,9 +1,10 @@
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const EmploymentLogin = require("../models/EmploymentLogin");
 
 const generateToken = (user) => {
-  return jwt.sign({ userId: user.EmploymentID }, "hmoms-keys", {
+  return jwt.sign({ userId: user.EmploymentID }, process.env.EMPLOYEE_JWT_KEY, {
     expiresIn: "3d",
   });
 };

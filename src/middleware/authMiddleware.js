@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 exports.authenticateToken = (req, res, next) => {
   const authHeader = req.header("Authorization");
@@ -7,11 +8,11 @@ exports.authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  jwt.verify(token, "hmoms-keys", (err, user) => {
+  jwt.verify(token, process.env.EMPLOYEE_JWT_KEY, (err, user) => {
     if (err) {
       return res.status(403).json({ message: "Forbidden" });
     }
-    req.userID = jwt.decode(token, "hmoms-keys");
+    req.userID = jwt.decode(token, process.env.EMPLOYEE_JWT_KEY);
     next();
   });
 };
