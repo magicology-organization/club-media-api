@@ -12,6 +12,7 @@ exports.login = async (req, res) => {
   const { username, password } = req.body;
   try {
     const employment = await EmploymentLogin.findByUsername(username);
+
     if (!employment) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
