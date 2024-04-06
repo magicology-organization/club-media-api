@@ -1,42 +1,18 @@
 const express = require("express");
-const productHandler = require("../handlers/productHandler");
+const authHandler = require("../handlers/authEmployeeHandler");
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+router.post("/login", authHandler.login);
 router.post(
-  "/add-product",
+  "/change-password",
   authMiddleware.authenticateToken,
-  productHandler.uploadProduct
+  authHandler.changePassword
 );
 
-router.patch(
-  "/update-product/:productId",
-  authMiddleware.authenticateToken,
-  productHandler.updateProduct
-);
-
-router.get("/:productId", productHandler.getProductByID);
-
-router.get(
-  "/starts-with/:letter",
-  productHandler.findProductsByNameStartingWith
-);
-
-router.delete(
-  "/delete/:productId",
-  authMiddleware.authenticateToken,
-  productHandler.deleteProduct
-);
-
-router.get("/", productHandler.getAllProducts);
-
-router.all("/add-product", methodNotAllowedHandler);
-router.all("/update-product/:productId", methodNotAllowedHandler);
-router.all("/:productId", methodNotAllowedHandler);
-router.all("/starts-with/:letter", methodNotAllowedHandler);
-router.all("/delete/:productId", methodNotAllowedHandler);
-router.all("/", methodNotAllowedHandler);
+router.all("/login", methodNotAllowedHandler);
+router.all("/change-password", methodNotAllowedHandler);
 
 function methodNotAllowedHandler(req, res, next) {
   res.status(405).send("Method Not Allowed");

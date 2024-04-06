@@ -30,4 +30,16 @@ router.delete(
 );
 
 router.get("/", productHandler.getAllProducts);
+
+router.all("/add-product", methodNotAllowedHandler);
+router.all("/update-product/:productId", methodNotAllowedHandler);
+router.all("/:productId", methodNotAllowedHandler);
+router.all("/starts-with/:letter", methodNotAllowedHandler);
+router.all("/delete/:productId", methodNotAllowedHandler);
+router.all("/", methodNotAllowedHandler);
+
+function methodNotAllowedHandler(req, res, next) {
+  res.status(405).send("Method Not Allowed");
+}
+
 module.exports = router;
