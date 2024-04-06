@@ -11,6 +11,7 @@ app.disable("x-powered-by");
 
 //routes defines (to be seperated)
 const authEmployeeRoutes = require("./routes/authEmployeeRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/auth", authEmployeeRoutes);
+app.use("/api/products", productRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

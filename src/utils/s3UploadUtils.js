@@ -8,11 +8,17 @@ const s3 = new AWS.S3({
   region: process.env.DEFAULT_REGION_AWS,
 });
 
-const uploadImageToS3 = (file) => {
+// Modified to ensure unique keys across the bucket
+// Images will be stored within tmp folder, uploads will stay there and be deleted after execution
+const uploadImageToS3 = (file, imageKey) => {
+  // Determine the content type of the image based on its file extension
+  const contentType = file.mimetype;
+
   const params = {
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: file.originalname,
+    Key: imageKey,
     Body: file.buffer,
+    ContentType: contentType, // Set the content type dynamically
   };
 
   return new Promise((resolve, reject) => {

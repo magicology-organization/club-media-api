@@ -89,3 +89,5 @@ Product.findByNameStartingWith = (letter) => {
     );
   });
 };
+
+module.exports = Product;
