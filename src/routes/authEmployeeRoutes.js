@@ -11,4 +11,11 @@ router.post(
   authHandler.changePassword
 );
 
+router.all("/login", methodNotAllowedHandler);
+router.all("/change-password", methodNotAllowedHandler);
+
+function methodNotAllowedHandler(req, res, next) {
+  res.status(405).send("Method Not Allowed");
+}
+
 module.exports = router;

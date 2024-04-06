@@ -10,4 +10,10 @@ router.post(
   productHandler.uploadProduct
 );
 
+router.patch(
+  "/update-product",
+  authMiddleware.authenticateToken,
+  productHandler.updateProduct
+);
+
 module.exports = router;
