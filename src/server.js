@@ -17,17 +17,16 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
-  // Check if the request is attempting to redirect
   if (req.url === "/" || req.url === "/api") {
-    // Handle the redirect request
     res.status(403).send("Redirects are not allowed");
   } else {
-    // Continue to the next middleware or route handler
     next();
   }
 });
+
 app.use("/api/auth", authEmployeeRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log("Default region in the cloud: " + process.env.DEFAULT_REGION_AWS);
 });
