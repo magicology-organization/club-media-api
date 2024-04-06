@@ -32,6 +32,24 @@ const uploadImageToS3 = (file, imageKey) => {
   });
 };
 
+const deleteObjectFromS3 = (objectKey) => {
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: objectKey,
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(params, (error, data) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
+
 module.exports = {
   uploadImageToS3,
+  deleteObjectFromS3,
 };

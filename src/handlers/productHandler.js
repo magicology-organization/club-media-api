@@ -1,6 +1,9 @@
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
-const { uploadImageToS3 } = require("../utils/s3UploadUtils");
+const {
+  uploadImageToS3,
+  deleteObjectFromS3,
+} = require("../utils/s3BucketUtils");
 const Product = require("../models/Products");
 const EmploymentLogin = require("../models/EmploymentLogin");
 
@@ -81,7 +84,7 @@ exports.updateProduct = [
         name: req.body.name || existingProduct.Name,
         description: req.body.description || existingProduct.Description,
         categoryID: req.body.categoryID || existingProduct.CategoryID,
-        imageLink: existingProduct.imageLink,
+        imageLink: existingProduct.ImageLink,
       };
 
       const success = await Product.updateProduct(
@@ -113,10 +116,15 @@ exports.deleteProduct = [
         return res.status(400).json({ message: "Product ID is required" });
       }
 
+      const s3URL = (await Product.findById(productID)).ImageLink;
       const deletingProduct = await Product.deleteProduct(productID);
       if (!deletingProduct) {
         return res.status(404).json({ message: "Product not found" });
       }
+
+      const match = s3URL.match(/https:\/\/.*\.s3\.amazonaws\.com\/(.*)/);
+      const keyToDelete = match[1];
+      await deleteObjectFromS3(keyToDelete);
 
       if (deletingProduct) {
         res.status(200).json({ message: "Product deleted successfully" });
