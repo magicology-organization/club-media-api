@@ -7,20 +7,32 @@ const EmploymentLogin = require("../models/EmploymentLogin");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// Function to check user authorization
+const checkAuthorization = async (req, res) => {
+  try {
+    const userID = req.userID.userId;
+    if (!userID) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const user = await EmploymentLogin.findByID(userID);
+    if (!user) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    return userID;
+  } catch (error) {
+    console.error("Error checking authorization:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Middleware to upload a product
 exports.uploadProduct = [
   upload.single("image"),
   async (req, res) => {
     try {
-      const userID = req.userID.userId;
-      if (!userID) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      const user = await EmploymentLogin.findByID(userID);
+      const userID = await checkAuthorization(req, res);
+      if (!userID) return; // Return if authorization check fails
 
-      // check for active employee / files uploaded
-      if (!user) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
@@ -33,7 +45,7 @@ exports.uploadProduct = [
         name: req.body.name,
         description: req.body.description,
         imageLink: imageLink,
-        createdBy: user.EmployeeID,
+        createdBy: userID, // Using userID obtained from authorization check
         categoryID: req.body.categoryID,
       };
 
@@ -48,21 +60,14 @@ exports.uploadProduct = [
   },
 ];
 
+// Middleware to update a product
 exports.updateProduct = [
   async (req, res) => {
     try {
-      const userID = req.userID.userId;
-      if (!userID) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const userID = await checkAuthorization(req, res);
+      if (!userID) return; // Return if authorization check fails
 
-      const user = await EmploymentLogin.findByID(userID);
-
-      if (!user) {
-        return res.status(403).json({ message: "Forbidden" });
-      }
-
-      const productID = req.body.productID;
+      const productID = req.params.productId;
       if (!productID) {
         return res.status(400).json({ message: "Product ID is required" });
       }
@@ -96,3 +101,75 @@ exports.updateProduct = [
     }
   },
 ];
+
+exports.deleteProduct = [
+  async (req, res) => {
+    try {
+      const userID = await checkAuthorization(req, res);
+      if (!userID) return;
+
+      const productID = req.params.productId;
+      if (!productID) {
+        return res.status(400).json({ message: "Product ID is required" });
+      }
+
+      const deletingProduct = await Product.deleteProduct(productID);
+      if (!deletingProduct) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      if (deletingProduct) {
+        res.status(200).json({ message: "Product deleted successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to delete product" });
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+];
+
+exports.getProductByID = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({ product });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.getAllProducts();
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.findProductsByNameStartingWith = async (req, res) => {
+  try {
+    const letter = req.params.letter;
+    if (!letter) {
+      return res.status(400).json({ message: "Letter is required" });
+    }
+
+    const products = await Product.findByNameStartingWith(letter);
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error("Error finding products:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

@@ -11,9 +11,23 @@ router.post(
 );
 
 router.patch(
-  "/update-product",
+  "/update-product/:productId",
   authMiddleware.authenticateToken,
   productHandler.updateProduct
 );
 
+router.get("/:productId", productHandler.getProductByID);
+
+router.get(
+  "/starts-with/:letter",
+  productHandler.findProductsByNameStartingWith
+);
+
+router.delete(
+  "/delete/:productId",
+  authMiddleware.authenticateToken,
+  productHandler.deleteProduct
+);
+
+router.get("/", productHandler.getAllProducts);
 module.exports = router;
