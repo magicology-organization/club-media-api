@@ -1,5 +1,5 @@
 const express = require("express");
-const productHandler = require("../handlers/productHandler");
+const ProductHandler = require("../handlers/productHandler");
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
@@ -7,29 +7,29 @@ const router = express.Router();
 router.post(
   "/add-product",
   authMiddleware.authenticateToken,
-  productHandler.uploadProduct
+  ProductHandler.uploadProduct
 );
 
 router.patch(
   "/update-product/:productId",
   authMiddleware.authenticateToken,
-  productHandler.updateProduct
+  ProductHandler.updateProduct
 );
 
-router.get("/:productId", productHandler.getProductByID);
+router.get("/:productId", ProductHandler.getProductByID);
 
 router.get(
   "/starts-with/:letter",
-  productHandler.findProductsByNameStartingWith
+  ProductHandler.findProductsByNameStartingWith
 );
 
 router.delete(
   "/delete/:productId",
   authMiddleware.authenticateToken,
-  productHandler.deleteProduct
+  ProductHandler.deleteProduct
 );
 
-router.get("/", productHandler.getAllProducts);
+router.get("/", ProductHandler.getAllProducts);
 
 router.all("/add-product", methodNotAllowedHandler);
 router.all("/update-product/:productId", methodNotAllowedHandler);
