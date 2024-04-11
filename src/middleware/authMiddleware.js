@@ -8,11 +8,11 @@ exports.authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  jwt.verify(token, process.env.EMPLOYEE_JWT_KEY, (err, user) => {
+  jwt.verify(token, process.env.ADMIN_JWT_KEY, (err, user) => {
     if (err) {
       return res.status(403).json({ message: "Forbidden" });
     }
-    req.userID = jwt.decode(token, process.env.EMPLOYEE_JWT_KEY);
+    req.userID = jwt.decode(token, process.env.ADMIN_JWT_KEY);
     next();
   });
 };

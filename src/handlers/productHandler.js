@@ -5,7 +5,7 @@ const {
   deleteObjectFromS3,
 } = require("../utils/s3BucketUtils");
 const Product = require("../models/Products");
-const EmploymentLogin = require("../models/EmploymentLogin");
+const EmploymentLogin = require("../models/AdminLogin");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });

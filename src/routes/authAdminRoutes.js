@@ -1,11 +1,11 @@
 const express = require("express");
-const AuthHandler = require("../handlers/authEmployeeHandler");
+const AuthHandler = require("../handlers/authAdminHandler");
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 router.post("/login", AuthHandler.login);
-router.post(
+router.put(
   "/change-password",
   authMiddleware.authenticateToken,
   AuthHandler.changePassword

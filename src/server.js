@@ -10,7 +10,7 @@ app.disable("x-powered-by");
 // reduce fingerprints
 
 //routes defines (to be seperated)
-const authEmployeeRoutes = require("./routes/authEmployeeRoutes");
+const authEmployeeRoutes = require("./routes/authAdminRoutes");
 const productRoutes = require("./routes/productRoutes");
 
 const PORT = process.env.PORT || 3000;

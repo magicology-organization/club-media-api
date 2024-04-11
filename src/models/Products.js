@@ -4,7 +4,7 @@ class Product {
   static createProduct(productData) {
     return new Promise((resolve, reject) => {
       connection.query(
-        "INSERT INTO Products (Name, Description, ImageLink, CreatedBy, CategoryID) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO News (Name, Description, ImageLink, CreatedBy, CategoryID) VALUES (?, ?, ?, ?, ?)",
         [
           productData.name,
           productData.description,
@@ -25,7 +25,7 @@ class Product {
   static updateProduct(productID, productData, modifiedBy) {
     return new Promise((resolve, reject) => {
       connection.query(
-        "UPDATE Products SET Name = ?, Description = ?, ImageLink = ?, ModifiedBy = ?, CategoryID = ?, ModifiedAt = CURRENT_TIMESTAMP WHERE ProductID = ?",
+        "UPDATE News SET Name = ?, Description = ?, ImageLink = ?, ModifiedBy = ?, CategoryID = ?, ModifiedAt = CURRENT_TIMESTAMP WHERE NewsID = ?",
         [
           productData.name,
           productData.description,
@@ -47,7 +47,7 @@ class Product {
   static deleteProduct(productID) {
     return new Promise((resolve, reject) => {
       connection.query(
-        "DELETE FROM Products WHERE ProductID = ?",
+        "DELETE FROM News WHERE NewsID = ?",
         productID,
         (error, results) => {
           if (error) {
@@ -62,7 +62,7 @@ class Product {
   static findById(productID) {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM Products WHERE ProductID = ?",
+        "SELECT * FROM News WHERE NewID = ?",
         productID,
         (error, results) => {
           if (error) {
@@ -77,7 +77,7 @@ class Product {
   static findByNameStartingWith(letter) {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM Products WHERE Name LIKE ? ORDER BY Name ASC",
+        "SELECT * FROM News WHERE Name LIKE ? ORDER BY Name ASC",
         [`${letter}%`],
         (error, results) => {
           if (error) {
@@ -91,7 +91,7 @@ class Product {
 
   static getAllProducts() {
     return new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM Products", (error, results) => {
+      connection.query("SELECT * FROM News", (error, results) => {
         if (error) {
           return reject(error);
         }

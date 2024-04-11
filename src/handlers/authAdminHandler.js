@@ -1,32 +1,28 @@
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const EmploymentLogin = require("../models/EmploymentLogin");
+const AdminLogin = require("../models/AdminLogin");
 
 class AuthHandler {
   static generateToken(user) {
-    return jwt.sign(
-      { userId: user.EmploymentID },
-      process.env.EMPLOYEE_JWT_KEY,
-      {
-        expiresIn: "3d",
-      }
-    );
+    return jwt.sign({ userId: user.AdminID }, process.env.ADMIN_JWT_KEY, {
+      expiresIn: "3d",
+    });
   }
 
   static async login(req, res) {
     const { username, password } = req.body;
     try {
-      const employment = await EmploymentLogin.findByUsername(username);
+      const admin = await AdminLogin.findByUsername(username);
 
-      if (!employment) {
+      if (!admin) {
         return res
           .status(401)
           .json({ message: "Invalid username or password" });
       }
-      const validate = await EmploymentLogin.comparePassword(
+      const validate = await AdminLogin.comparePassword(
         password,
-        employment.LoginPassword
+        admin.LoginPassword
       );
 
       if (!validate) {
@@ -35,7 +31,7 @@ class AuthHandler {
           .json({ message: "Invalid username or password" });
       }
 
-      const token = AuthHandler.generateToken(employment);
+      const token = AuthHandler.generateToken(admin);
       res.json({ token });
     } catch (error) {
       console.error("Error during login:", error);
@@ -44,18 +40,18 @@ class AuthHandler {
   }
 
   static async changePassword(req, res) {
-    const employmentID = req.userID.userId;
+    const AdminID = req.userID.userId;
     const { currentPassword, newPassword } = req.body;
     try {
-      const employment = await EmploymentLogin.findByID(employmentID);
+      const admin = await AdminLogin.findByID(AdminID);
 
-      if (!employment) {
+      if (!admin) {
         return res.status(404).json({ message: "User does not exist" });
       }
 
-      const validate = await EmploymentLogin.comparePassword(
+      const validate = await AdminLogin.comparePassword(
         currentPassword,
-        employment.LoginPassword
+        admin.LoginPassword
       );
 
       if (!validate) {
@@ -65,7 +61,7 @@ class AuthHandler {
       }
 
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      await EmploymentLogin.updatePassword(employmentID, hashedNewPassword);
+      await AdminLogin.updatePassword(AdminID, hashedNewPassword);
       res.json({ message: "Password updated successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
