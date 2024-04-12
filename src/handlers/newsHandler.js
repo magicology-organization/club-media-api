@@ -54,7 +54,7 @@ class NewsHandler {
           });
         }
         const file = req.file;
-        const imageKey = `${uuidv4()}-${file.originalname}`;
+        const imageKey = `${uuidv4()}`;
         const imageLink = await uploadImageToS3(file, imageKey);
         delete req.file;
 
@@ -130,12 +130,11 @@ class NewsHandler {
           return res.status(404).json({ message: "News not found" });
         }
         const s3URL = s3ToDelete.ImageLink;
-        const deletingNews = await News.deleteNews(newsID);
 
         const match = s3URL.match(/https:\/\/.*\.s3\.amazonaws\.com\/(.*)/);
         const keyToDelete = match[1];
         await deleteObjectFromS3(keyToDelete);
-
+        const deletingNews = await News.deleteNews(newsID);
         if (deletingNews) {
           res.status(200).json({ message: "News deleted successfully" });
         } else {
@@ -184,7 +183,7 @@ class NewsHandler {
         return res.status(400).json({ message: "Letter is required" });
       }
 
-      const news = await News.findByTitleStartingWith(news);
+      const news = await News.findByTitleStartingWith(letter);
       res.status(200).json({ news });
     } catch (error) {
       console.error("Error finding news:", error);
