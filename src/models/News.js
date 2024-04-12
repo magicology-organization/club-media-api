@@ -4,13 +4,13 @@ class News {
   static postNews(newsData) {
     return new Promise((resolve, reject) => {
       connection.query(
-        "INSERT INTO News (Title, Content, ShortDescription, ImageLink, CreatedBy, CategoryID) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO News (Title, ShortDescription, Content, ImageLink, CreatedBy, CategoryID) VALUES (?, ?, ?, ?, ?, ?)",
         [
           newsData.title,
+          newsData.shortDescription,
           newsData.content,
-          newsdata.shortDescription,
           newsData.imageLink,
-          newsData.userID,
+          newsData.createdBy,
           newsData.categoryID,
         ],
         (error, results) => {

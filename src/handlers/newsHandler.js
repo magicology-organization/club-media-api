@@ -21,7 +21,7 @@ class NewsHandler {
       if (!user) {
         return res.status(403).json({ message: "Forbidden" });
       }
-      return user.userID;
+      return user.UserID;
     } catch (error) {
       console.error("Error checking authorization:", error);
       return res.status(500).json({ message: "Internal server error" });
@@ -34,11 +34,24 @@ class NewsHandler {
       try {
         const userID = await NewsHandler.checkAuthorization(req, res);
         if (!userID) return; // Return if authorization check fails
-
         if (!req.file) {
           return res
             .status(400)
             .json({ message: "No illustration image uploaded" });
+        }
+        const requiredFields = [
+          "title",
+          "content",
+          "description",
+          "categoryID",
+        ];
+        const missingFields = requiredFields.filter(
+          (field) => !req.body[field]
+        );
+        if (missingFields.length > 0) {
+          return res.status(400).json({
+            message: `Missing required fields: ${missingFields.join(", ")}`,
+          });
         }
         const file = req.file;
         const imageKey = `${uuidv4()}-${file.originalname}`;
@@ -51,7 +64,7 @@ class NewsHandler {
           shortDescription: req.body.description,
           imageLink: imageLink,
           createdBy: userID, // Using userID obtained from authorization check
-          categoryID: req.body.categoryID,
+          categoryID: parseInt(req.body.categoryID),
         };
 
         const newsID = await News.postNews(newsData);
@@ -142,7 +155,7 @@ class NewsHandler {
         return res.status(400).json({ message: "News ID is required" });
       }
 
-      const news = await News.findById(NewsID);
+      const news = await News.findById(newsID);
       if (!news) {
         return res.status(404).json({ message: "News not found" });
       }

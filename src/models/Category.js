@@ -72,3 +72,5 @@ class NewsCategory {
     });
   }
 }
+
+module.exports = NewsCategory;

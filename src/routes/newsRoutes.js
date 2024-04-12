@@ -5,39 +5,39 @@ const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.post(
-  "/add-product",
+  "/post-news",
   authMiddleware.authenticateToken,
   NewsHandler.postNews
 );
 
 router.patch(
-  "/update-product/:productId",
+  "/update-news/:newsID",
   authMiddleware.authenticateToken,
   NewsHandler.updateNews
 );
 
-router.get("/:productId", NewsHandler.getNewsByID);
+router.get("/find/:newsID", NewsHandler.getNewsByID);
 
 router.get("/starts-with/:letter", NewsHandler.findNewsByTitleStartingWith);
 
 router.delete(
-  "/delete/:productId",
+  "/delete/:newsID",
   authMiddleware.authenticateToken,
   NewsHandler.deleteNews
 );
 
 router.get("/index-from/:index", NewsHandler.getSixNews);
 router.get("/recent", NewsHandler.getRecentNews);
-router.get("/", NewsHandler.getAllNews);
+router.get("/all", NewsHandler.getAllNews);
 
-router.all("/add-product", methodNotAllowedHandler);
-router.all("/update-product/:productId", methodNotAllowedHandler);
-router.all("/:productId", methodNotAllowedHandler);
+router.all("/post-news", methodNotAllowedHandler);
+router.all("/update-news/:newsID", methodNotAllowedHandler);
+router.all("/find/:newsID", methodNotAllowedHandler);
 router.all("/starts-with/:letter", methodNotAllowedHandler);
-router.all("/delete/:productId", methodNotAllowedHandler);
+router.all("/delete/:newsID", methodNotAllowedHandler);
 router.all("/recent", methodNotAllowedHandler);
 router.all("/index-from/:index", methodNotAllowedHandler);
-router.all("/", methodNotAllowedHandler);
+router.all("/all", methodNotAllowedHandler);
 
 function methodNotAllowedHandler(req, res, next) {
   res.status(405).send("Method Not Allowed");

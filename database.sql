@@ -68,3 +68,9 @@ VALUES (
     'mahou_anisphia',
     '$2a$10$MdOrjV5QMfEstmdunxW1rO1ye7QZgzVPtNdqzQOd42HGiEkDAgZke'
 );
+
+INSERT INTO NewsCategories (Name) VALUES ('Magicology');
+INSERT INTO NewsCategories (Name) VALUES ('Politics');
+INSERT INTO NewsCategories (Name) VALUES ('Entertainment');
+INSERT INTO NewsCategories (Name) VALUES ('Sports');
+INSERT INTO NewsCategories (Name) VALUES ('Health');
