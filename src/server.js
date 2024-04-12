@@ -1,10 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const connection = require("./config/dbConfig");
-const helmet = require("helmet");
 
 const app = express();
-app.use(helmet());
+
+//deployment dependencies
+// const helmet = require("helmet");
+// app.use(helmet());
+
+//dev dependencies
+const cors = require("cors");
+app.use(cors());
+
 // avoid being attacked by common HTTP
 app.disable("x-powered-by");
 // reduce fingerprints
