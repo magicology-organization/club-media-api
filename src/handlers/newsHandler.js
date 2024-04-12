@@ -4,181 +4,205 @@ const {
   uploadImageToS3,
   deleteObjectFromS3,
 } = require("../utils/s3BucketUtils");
-const Product = require("../models/News");
-const EmploymentLogin = require("../models/AdminLogin");
+const News = require("../models/News");
+const AdminLogin = require("../models/AdminLogin");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-class ProductHandler {
+class NewsHandler {
   static async checkAuthorization(req, res) {
     try {
       const userID = req.userID.userId;
       if (!userID) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await EmploymentLogin.findByID(userID);
+      const user = await AdminLogin.findByID(userID);
       if (!user) {
         return res.status(403).json({ message: "Forbidden" });
       }
-      return userID;
+      return user.userID;
     } catch (error) {
       console.error("Error checking authorization:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
 
-  static uploadProduct = [
+  static postNews = [
     upload.single("image"),
     async (req, res) => {
       try {
-        const userID = await ProductHandler.checkAuthorization(req, res);
+        const userID = await NewsHandler.checkAuthorization(req, res);
         if (!userID) return; // Return if authorization check fails
 
         if (!req.file) {
-          return res.status(400).json({ message: "No file uploaded" });
+          return res
+            .status(400)
+            .json({ message: "No illustration image uploaded" });
         }
         const file = req.file;
         const imageKey = `${uuidv4()}-${file.originalname}`;
         const imageLink = await uploadImageToS3(file, imageKey);
         delete req.file;
 
-        const productData = {
-          name: req.body.name,
-          description: req.body.description,
+        const newsData = {
+          title: req.body.title,
+          content: req.body.content,
+          shortDescription: req.body.description,
           imageLink: imageLink,
           createdBy: userID, // Using userID obtained from authorization check
           categoryID: req.body.categoryID,
         };
 
-        const productId = await Product.createProduct(productData);
-        res
-          .status(201)
-          .json({ message: "Product uploaded successfully", productId });
+        const newsID = await News.postNews(newsData);
+        res.status(201).json({ message: "News posted successfully", newsID });
       } catch (error) {
-        console.error("Error uploading product:", error);
+        console.error("Error posting news:", error);
         res.status(500).json({ message: "Internal server error" });
       }
     },
   ];
 
-  static updateProduct = [
+  static updateNews = [
     async (req, res) => {
       try {
-        const userID = await ProductHandler.checkAuthorization(req, res);
+        const userID = await NewsHandler.checkAuthorization(req, res);
         if (!userID) return; // Return if authorization check fails
 
-        const productID = req.params.productId;
-        if (!productID) {
-          return res.status(400).json({ message: "Product ID is required" });
+        const newsID = req.params.newsID;
+        if (!newsID) {
+          return res.status(400).json({ message: "News ID is required" });
         }
 
-        const existingProduct = await Product.findById(productID);
-        if (!existingProduct) {
-          return res.status(404).json({ message: "Product not found" });
+        const existingNews = await News.findById(newsID);
+        if (!existingNews) {
+          return res.status(404).json({ message: "News not found" });
         }
 
-        const updatedProductData = {
-          name: req.body.name || existingProduct.Name,
-          description: req.body.description || existingProduct.Description,
-          categoryID: req.body.categoryID || existingProduct.CategoryID,
-          imageLink: existingProduct.ImageLink,
+        const updatedNewsData = {
+          title: req.body.title || existingNews.Title,
+          content: req.body.content || existingNews.Content,
+          shortDescription:
+            req.body.shortDescription || existingNews.ShortDescription,
+          imageLink: existingNews.ImageLink,
+          categoryID: req.body.categoryID || existingNews.CategoryID,
         };
 
-        const success = await Product.updateProduct(
-          productID,
-          updatedProductData,
-          userID
-        );
+        const success = await News.updateNews(newsID, updatedNewsData, userID);
 
         if (success) {
-          res.status(200).json({ message: "Product updated successfully" });
+          res.status(200).json({ message: "News updated successfully" });
         } else {
-          res.status(500).json({ message: "Failed to update product" });
+          res.status(500).json({ message: "Failed to update news" });
         }
       } catch (error) {
-        console.error("Error updating product:", error);
+        console.error("Error updating news:", error);
         res.status(500).json({ message: "Internal server error" });
       }
     },
   ];
 
-  static deleteProduct = [
+  static deleteNews = [
     async (req, res) => {
       try {
-        const userID = await ProductHandler.checkAuthorization(req, res);
+        const userID = await NewsHandler.checkAuthorization(req, res);
         if (!userID) return;
 
-        const productID = req.params.productId;
-        if (!productID) {
-          return res.status(400).json({ message: "Product ID is required" });
+        const newsID = req.params.newsID;
+        if (!newsID) {
+          return res.status(400).json({ message: "News ID is required" });
         }
-        const s3ToDelete = await Product.findById(productID);
+        const s3ToDelete = await News.findById(newsID);
         if (!s3ToDelete) {
-          return res.status(404).json({ message: "Product not found" });
+          return res.status(404).json({ message: "News not found" });
         }
         const s3URL = s3ToDelete.ImageLink;
-        const deletingProduct = await Product.deleteProduct(productID);
+        const deletingNews = await News.deleteNews(newsID);
 
         const match = s3URL.match(/https:\/\/.*\.s3\.amazonaws\.com\/(.*)/);
         const keyToDelete = match[1];
         await deleteObjectFromS3(keyToDelete);
 
-        if (deletingProduct) {
-          res.status(200).json({ message: "Product deleted successfully" });
+        if (deletingNews) {
+          res.status(200).json({ message: "News deleted successfully" });
         } else {
-          res.status(500).json({ message: "Failed to delete product" });
+          res.status(500).json({ message: "Failed to delete news" });
         }
       } catch (error) {
-        console.error("Error updating product:", error);
+        console.error("Error updating news:", error);
         res.status(500).json({ message: "Internal server error" });
       }
     },
   ];
 
-  static async getProductByID(req, res) {
+  static async getNewsByID(req, res) {
     try {
-      const productId = req.params.productId;
-      if (!productId) {
-        return res.status(400).json({ message: "Product ID is required" });
+      const newsID = req.params.newsID;
+      if (!newsID) {
+        return res.status(400).json({ message: "News ID is required" });
       }
 
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+      const news = await News.findById(NewsID);
+      if (!news) {
+        return res.status(404).json({ message: "News not found" });
       }
 
-      res.status(200).json({ product });
+      res.status(200).json({ news });
     } catch (error) {
-      console.error("Error fetching product:", error);
+      console.error("Error fetching news:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
 
-  static async getAllProducts(req, res) {
+  static async getAllNews(req, res) {
     try {
-      const products = await Product.getAllProducts();
-      res.status(200).json({ products });
+      const news = await News.getAllNews();
+      res.status(200).json({ news });
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching news:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
 
-  static async findProductsByNameStartingWith(req, res) {
+  static async findNewsByTitleStartingWith(req, res) {
     try {
       const letter = req.params.letter;
       if (!letter) {
         return res.status(400).json({ message: "Letter is required" });
       }
 
-      const products = await Product.findByNameStartingWith(letter);
-      res.status(200).json({ products });
+      const news = await News.findByTitleStartingWith(news);
+      res.status(200).json({ news });
     } catch (error) {
-      console.error("Error finding products:", error);
+      console.error("Error finding news:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  static async getRecentNews(req, res) {
+    try {
+      const recentNews = await News.getRecentNews();
+      res.status(200).json({ recentNews });
+    } catch (error) {
+      console.error("Error fetching recent news:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  static async getSixNews(req, res) {
+    try {
+      const { startIndex } = req.params.index;
+      if (!startIndex) {
+        return res.status(400).json({ message: "Start index is required" });
+      }
+
+      const nextSixNews = await News.getNextSixNews(parseInt(startIndex));
+      res.status(200).json({ nextSixNews });
+    } catch (error) {
+      console.error("Error fetching next six news:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
 }
 
-module.exports = ProductHandler;
+module.exports = NewsHandler;
