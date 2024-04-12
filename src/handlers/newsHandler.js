@@ -4,7 +4,7 @@ const {
   uploadImageToS3,
   deleteObjectFromS3,
 } = require("../utils/s3BucketUtils");
-const Product = require("../models/Products");
+const Product = require("../models/News");
 const EmploymentLogin = require("../models/AdminLogin");
 
 const storage = multer.memoryStorage();
