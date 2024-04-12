@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const connection = require("./config/dbConfig");
+const connection = require("../src/config/dbConfig");
 
 const app = express();
 
@@ -17,8 +17,8 @@ app.disable("x-powered-by");
 // reduce fingerprints
 
 //routes defines (to be seperated)
-const authEmployeeRoutes = require("./routes/authAdminRoutes");
-const newsRoutes = require("./routes/newsRoutes");
+const authEmployeeRoutes = require("../src/routes/authAdminRoutes");
+const newsRoutes = require("../src/routes/newsRoutes");
 
 const PORT = process.env.PORT || 3000;
 
