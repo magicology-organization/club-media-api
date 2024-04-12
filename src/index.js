@@ -1,17 +1,24 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const connection = require("./config/dbConfig");
-const helmet = require("helmet");
 
 const app = express();
-app.use(helmet());
+
+//deployment dependencies
+// const helmet = require("helmet");
+// app.use(helmet());
+
+//dev dependencies
+const cors = require("cors");
+app.use(cors());
+
 // avoid being attacked by common HTTP
 app.disable("x-powered-by");
 // reduce fingerprints
 
 //routes defines (to be seperated)
-const authEmployeeRoutes = require("./routes/authEmployeeRoutes");
-const productRoutes = require("./routes/productRoutes");
+const authEmployeeRoutes = require("./routes/authAdminRoutes");
+const productRoutes = require("./routes/newsRoutes");
 
 const PORT = process.env.PORT || 3000;
 
@@ -26,6 +33,6 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/auth", authEmployeeRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/news", productRoutes);
 
 module.exports = app;
