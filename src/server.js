@@ -13,6 +13,7 @@ const cors = require("cors");
 app.use(cors());
 
 // avoid being attacked by common HTTP
+// seccurity dependencies
 app.disable("x-powered-by");
 // reduce fingerprints
 
