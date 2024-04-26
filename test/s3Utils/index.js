@@ -7,7 +7,7 @@ const imageBuffer = fs.readFileSync(imagePath);
 
 const file = {
   buffer: imageBuffer,
-  originalname: "anis_bullied.jpg",
+  originalname: "new_file.jpg",
 };
 
 uploadImageToS3(file, "anis-bullied-3.jpeg")
